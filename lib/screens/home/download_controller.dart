@@ -16,7 +16,9 @@ class DownloadController extends GetxController {
   final ReceivePort _port = ReceivePort();
   RxList<Downloading> downloadingTask = RxList<Downloading>();
   final Rx<MovieVideo> _selectedQuality = Rx<MovieVideo>(MovieVideo());
+
   MovieVideo get selectedQuality => _selectedQuality.value;
+
   set selectedQuality(MovieVideo value) => _selectedQuality.value = value;
 
   _unbindBackgroundIsolate() {
@@ -25,8 +27,7 @@ class DownloadController extends GetxController {
 
   void _bindBackgroundIsolate() {
     // Register the send port with the isolate name server
-    bool isSuccess = IsolateNameServer.registerPortWithName(
-        _port.sendPort, 'downloader_send_port');
+    bool isSuccess = IsolateNameServer.registerPortWithName(_port.sendPort, 'downloader_send_port');
     if (!isSuccess) {
       _unbindBackgroundIsolate();
       _bindBackgroundIsolate();
@@ -46,8 +47,7 @@ class DownloadController extends GetxController {
           print("called moin $progress");
           // Find the task in the list of downloading tasks
           for (var element in downloadingTask) {
-            print(
-                'called moin in loop ${element.taskId} $id $currentMovieId ${element.movieId}');
+            print('called moin in loop ${element.taskId} $id $currentMovieId ${element.movieId}');
             if (element.taskId == id && currentMovieId == element.movieId) {
               print('called moin in if');
 
@@ -86,11 +86,9 @@ class DownloadController extends GetxController {
   }
 
   @pragma('vm:entry-point')
-  static void downloadCallback(
-      String id, int status, int progress) {
+  static void downloadCallback(String id, int status, int progress) {
     print('called moin in downloadCallback $id $progress');
-    final SendPort? send =
-        IsolateNameServer.lookupPortByName('downloader_send_port');
+    final SendPort? send = IsolateNameServer.lookupPortByName('downloader_send_port');
 
     print('called after sendport');
     print('called ');
@@ -117,13 +115,10 @@ class DownloadController extends GetxController {
   }
 
   bool isAlreadyDownloded(List<Download> movies, String movieId) {
-    if (movies.firstWhereOrNull((element) => element.movieId == movieId) !=
-        null) {
+    if (movies.firstWhereOrNull((element) => element.movieId == movieId) != null) {
       Get.back();
       if (!Get.isSnackbarOpen) {
-        Get.rawSnackbar(
-            message: 'Already Downloded'.tr,
-            duration: const Duration(seconds: 1));
+        Get.rawSnackbar(message: 'Already Downloded'.tr, duration: const Duration(seconds: 1));
       }
       return true;
     } else {
@@ -131,22 +126,16 @@ class DownloadController extends GetxController {
     }
   }
 
-  Future<void> downloadAndStoreMovie(List<Download> movies,
-      Download currentMovie, LocalStorage storage) async {
+  Future<void> downloadAndStoreMovie(List<Download> movies, Download currentMovie, LocalStorage storage) async {
     try {
       final movieData = await downloadAndStoreFile(currentMovie, true, movies);
-      final posterData =
-          await downloadAndStoreFile(currentMovie, false, movies);
+      final posterData = await downloadAndStoreFile(currentMovie, false, movies);
       currentMovie.fileName = movieData['file_path'];
       currentMovie.taskId = movieData['task_id'];
       currentMovie.poster = posterData['file_path'];
       movies.add(currentMovie);
       print('called moin movie id ${movieData['task_id']}');
-      downloadingTask.add(Downloading(
-          movieId: currentMovie.movieId,
-          progress: 0,
-          taskId: movieData['task_id'],
-          movies: movies));
+      downloadingTask.add(Downloading(movieId: currentMovie.movieId, progress: 0, taskId: movieData['task_id'], movies: movies));
       // Get.back(); // Kishor
       // if (!Get.isSnackbarOpen) {
       //   Get.rawSnackbar(
@@ -164,8 +153,7 @@ class DownloadController extends GetxController {
     localStorage.setItem('movies', movies.map((e) => e.toMap()).toList());
   }
 
-  Future<Map<String, dynamic>> downloadAndStoreFile(
-      Download currentMovie, bool isMovie, List<Download> movies) async {
+  Future<Map<String, dynamic>> downloadAndStoreFile(Download currentMovie, bool isMovie, List<Download> movies) async {
     // Check for storage permission
     final permissionStatus = await Permission.storage.request();
     if (permissionStatus.isGranted) {
@@ -175,8 +163,7 @@ class DownloadController extends GetxController {
       String downloadDirctoryPath = "${appDocDir.path}/download";
       bool dirExists = await Directory(downloadDirctoryPath).exists();
       if (!dirExists) {
-        final Directory dir =
-            await Directory(downloadDirctoryPath).create(recursive: true);
+        final Directory dir = await Directory(downloadDirctoryPath).create(recursive: true);
         downloadDirctoryPath = dir.path;
       }
       // Generate a unique file name using the current date and time
@@ -184,13 +171,10 @@ class DownloadController extends GetxController {
       String fileNameWithDate =
           '${currentMovie.movieName}${currentDate.year}${currentDate.month}${currentDate.day}${currentDate.hour}${currentDate.minute}${currentDate.second}${currentDate.millisecond}';
       fileNameWithDate = fileNameWithDate.replaceAll(" ", "_");
-      String url="";
-      if(currentMovie.poster!.startsWith("${AppUrls.baseUrl}"))
-      {
+      String url = "";
+      if (currentMovie.poster!.startsWith("${AppUrls.baseUrl}")) {
         url = "${currentMovie.poster}";
-      }
-      else
-      {
+      } else {
         url = "${AppUrls.baseUrl}/${currentMovie.poster}";
       }
       // Download the file
@@ -202,12 +186,7 @@ class DownloadController extends GetxController {
         openFileFromNotification: false,
       );
       // Return the file path and task id (if downloading a movie)
-      return isMovie
-          ? {
-              "file_path": "$downloadDirctoryPath/$fileNameWithDate",
-              "task_id": taskId
-            }
-          : {"file_path": "$downloadDirctoryPath/$fileNameWithDate"};
+      return isMovie ? {"file_path": "$downloadDirctoryPath/$fileNameWithDate", "task_id": taskId} : {"file_path": "$downloadDirctoryPath/$fileNameWithDate"};
     } else {
       // Return empty map if storage permission not granted
       return {};
@@ -221,6 +200,6 @@ class Downloading {
   String? taskId;
   DownloadTaskStatus? status;
   List<Download>? movies;
-  Downloading(
-      {this.progress, this.movieId, this.taskId, this.status, this.movies});
+
+  Downloading({this.progress, this.movieId, this.taskId, this.status, this.movies});
 }

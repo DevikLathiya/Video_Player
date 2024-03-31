@@ -13,6 +13,7 @@ import '../../core/api_factory/prefs/pref_utils.dart';
 import 'model/download_model.dart';
 import 'package:hellomegha/screens/no_network.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+
 class VideoPlayerView extends StatefulWidget {
   Map<String, String>? urls;
   String movieName;
@@ -32,26 +33,26 @@ class VideoPlayerView extends StatefulWidget {
   final GestureTapCallback? onPrevious;
   final GestureTapCallback? onNext;
   final Stream<VideoPlayerNextPreviousModel>? stream;
-  VideoPlayerView(
-      {Key? key,
-      this.urls,
-      this.movieName = "",
-      required this.isFromNetwork,
-      this.filePath,
-      this.isMovie,
-      this.sid,
-      this.movieId,
-      this.seekTo,
-      this.isFromMoive = false,
-      this.onVideoDuration,
-      this.amountGiven,
-      this.movies,
-      this.currentDownloadedMovieIndex,
-      this.onPrevious,
-      this.onNext,
-      this.stream,
-      this.nextId,
-      this.previousId})
+
+  VideoPlayerView({Key? key,
+    this.urls,
+    this.movieName = "",
+    required this.isFromNetwork,
+    this.filePath,
+    this.isMovie,
+    this.sid,
+    this.movieId,
+    this.seekTo,
+    this.isFromMoive = false,
+    this.onVideoDuration,
+    this.amountGiven,
+    this.movies,
+    this.currentDownloadedMovieIndex,
+    this.onPrevious,
+    this.onNext,
+    this.stream,
+    this.nextId,
+    this.previousId})
       : super(key: key);
 
   @override
@@ -70,12 +71,15 @@ class _VideoPlayerViewState extends State<VideoPlayerView> with WidgetsBindingOb
   final ValueNotifier<int> _nextIndex = ValueNotifier(1);
 
   int get currentIndex => _currentIndex.value;
+
   set currentIndex(int value) => _currentIndex.value = value;
 
   int get previousIndex => _previousIndex.value;
+
   set previousIndex(int value) => _previousIndex.value = value;
 
   int get nextIndex => _nextIndex.value;
+
   set nextIndex(int value) => _nextIndex.value = value;
 
   GlobalKey globalKey = GlobalKey();
@@ -86,6 +90,7 @@ class _VideoPlayerViewState extends State<VideoPlayerView> with WidgetsBindingOb
       _betterPlayerController.enablePictureInPicture(globalKey);
     }
   }
+
   @override
   void didChangeDependencies() {
     // TODO: implement didChangeDependencies
@@ -154,7 +159,7 @@ class _VideoPlayerViewState extends State<VideoPlayerView> with WidgetsBindingOb
 
     BetterPlayerDataSource dataSource;
     BetterPlayerConfiguration betterPlayerConfiguration =
-        const BetterPlayerConfiguration(
+    const BetterPlayerConfiguration(
       aspectRatio: 16 / 9,
       fit: BoxFit.contain,
       autoPlay: true,
@@ -260,72 +265,72 @@ class _VideoPlayerViewState extends State<VideoPlayerView> with WidgetsBindingOb
               builder: (context, isInit, _) {
                 return isInit
                     ? BetterPlayer(
-                        key: globalKey,
-                        controller: _betterPlayerController,
-                        movieName: _movieName,
-                        amountGiven: widget.amountGiven,
-                        previousIndex: _previousIndex,
-                        nextIndex: _nextIndex,
-                        autoPlay: _autoPlay,
-                        onChanged: (value) {
-                          pref.setBool(PrefKeys.autoPlay, value);
-                          _autoPlay.value = !_autoPlay.value;
-                          showSuccessSnackbar(
-                              'Auto Play is ${_autoPlay.value ? "on" : "off"}',
-                              context);
-                        },
-                        onPrevious: widget.isFromNetwork
-                            ? () {
-                                _isInitiVideo.value = true;
-                                widget.onPrevious!.call();
-                              }
-                            : () {
-                                setState(() {
-                                  currentIndex = previousIndex;
-                                  _updatePreviousNextIndices();
-                                  _updateController();
-                                });
+                    key: globalKey,
+                    controller: _betterPlayerController,
+                    movieName: _movieName,
+                    amountGiven: widget.amountGiven,
+                    previousIndex: _previousIndex,
+                    nextIndex: _nextIndex,
+                    autoPlay: _autoPlay,
+                    onChanged: (value) {
+                      pref.setBool(PrefKeys.autoPlay, value);
+                      _autoPlay.value = !_autoPlay.value;
+                      showSuccessSnackbar(
+                          'Auto Play is ${_autoPlay.value ? "on" : "off"}',
+                          context);
+                    },
+                    onPrevious: widget.isFromNetwork
+                        ? () {
+                      _isInitiVideo.value = true;
+                      widget.onPrevious!.call();
+                    }
+                        : () {
+                      setState(() {
+                        currentIndex = previousIndex;
+                        _updatePreviousNextIndices();
+                        _updateController();
+                      });
+                    },
+                    onNext: widget.isFromNetwork
+                        ? () {
+                      _isInitiVideo.value = true;
+                      widget.onNext!.call();
+                    }
+                        : () {
+                      setState(() {
+                        currentIndex = nextIndex;
+                        _updatePreviousNextIndices();
+                        _updateController();
+                      });
+                    },
+                    onTap: () {
+                      if (widget.isFromNetwork) {
+                        PrefUtils.getToken().then((value) async {
+                          Api.request(
+                              method: HttpMethod.post,
+                              path: ApiEndPoints.saveEarnings,
+                              params: {
+                                "vid": widget.movieId,
+                                "type": "Movies",
+                                "sid": widget.sid,
+                                "coins": 0,
+                                "avg_run_time": formatDuration(
+                                    await _betterPlayerController.videoPlayerController!.position),
                               },
-                        onNext: widget.isFromNetwork
-                            ? () {
-                                _isInitiVideo.value = true;
-                                widget.onNext!.call();
-                              }
-                            : () {
-                                setState(() {
-                                  currentIndex = nextIndex;
-                                  _updatePreviousNextIndices();
-                                  _updateController();
-                                });
-                              },
-                        onTap: () {
-                          if (widget.isFromNetwork) {
-                            PrefUtils.getToken().then((value) async {
-                              Api.request(
-                                  method: HttpMethod.post,
-                                  path: ApiEndPoints.saveEarnings,
-                                  params: {
-                                    "vid": widget.movieId,
-                                    "type": "Movies",
-                                    "sid": widget.sid,
-                                    "coins": 0,
-                                    "avg_run_time": formatDuration(
-                                        await _betterPlayerController.videoPlayerController!.position),
-                                  },
-                                  token: value ?? "",
-                                  isAuthorization: true,
-                                  isCustomResponse: true,
-                                  isLoading: false,
-                                  context: Get.context!,
-                                  onResponse: (response) async {
-                                    Navigator.pop(context);
-                                  });
-                            });
-                          } else {
-                            Navigator.pop(context);
-                            Navigator.pop(context);
-                          }
-                        })
+                              token: value ?? "",
+                              isAuthorization: true,
+                              isCustomResponse: true,
+                              isLoading: false,
+                              context: Get.context!,
+                              onResponse: (response) async {
+                                Navigator.pop(context);
+                              });
+                        });
+                      } else {
+                        Navigator.pop(context);
+                        Navigator.pop(context);
+                      }
+                    })
                     : const SizedBox();
               }),
         ),
@@ -336,9 +341,9 @@ class _VideoPlayerViewState extends State<VideoPlayerView> with WidgetsBindingOb
   String formatDuration(Duration? duration) {
     String hours = duration!.inHours.toString().padLeft(0, '2');
     String minutes =
-        duration.inMinutes.remainder(60).toString().padLeft(2, '0');
+    duration.inMinutes.remainder(60).toString().padLeft(2, '0');
     String seconds =
-        duration.inSeconds.remainder(60).toString().padLeft(2, '0');
+    duration.inSeconds.remainder(60).toString().padLeft(2, '0');
     return "$hours:$minutes:$seconds";
   }
 }
