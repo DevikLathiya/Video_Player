@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "124009551331",
+    "project_id": "hello-megha",
+    "storage_bucket": "hello-megha.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:124009551331:android:05c3a2abc9222649373cd6",
+        "android_client_info": {
+          "package_name": "com.meghalaya.hellomegha"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "124009551331-gjuf3gihnnb1qnkpt1gad2u23l09ckpn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC5Z4n-DEFRcSDk9iLqus889scmXdxVQb0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "124009551331-gjuf3gihnnb1qnkpt1gad2u23l09ckpn.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "124009551331-6h8jgh43v11lv2povneqgokio3ln9ucf.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.app.hellomegha"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
